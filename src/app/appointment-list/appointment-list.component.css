@@ -1,0 +1,12 @@
+.sort-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.mat-form-field {
+  width: 200px;
+}
+.align-center {
+  text-align: left;
+}
