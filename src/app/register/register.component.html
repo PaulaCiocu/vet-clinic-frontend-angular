@@ -1,0 +1,40 @@
+<div class="container-fluid">
+  <div class="row mt-5">
+    <div class="col"></div>
+    <div class="col-4">
+      <div class="card shadow">
+        <div class="card-body">
+            <div class="mb-3">
+              <h4 class="text-dark text-muted">Register</h4>
+            </div>
+            <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+              <div class="form-group">
+                <label class="form-label" for="username">Name</label>
+                <input type="text" id="username" formControlName="username" class="form-control">
+                <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="text-danger">
+                  Name is required.
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" formControlName="password" class="form-control">
+                <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="text-danger">
+                  Password is required.
+                </div>
+              </div>
+              <button type="submit" class="btn btn-info" [disabled]="registerForm.invalid">Register</button>
+            </form>
+
+            <div class="row">
+              <div class="col-md-6">
+                <a href="/login" style="text-decoration: none;">Have an account ? <span class="text-danger">Login</span></a>
+              </div>
+            </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="col"></div>
+  </div>
+</div>
+
