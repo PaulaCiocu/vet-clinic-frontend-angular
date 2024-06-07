@@ -13,7 +13,7 @@ export class AppointmentService {
 
   constructor(private http: HttpClient) { }
 
-  getAppointments(page: number, sortField?:string, sortDirection?: 'asc' | 'desc'): Observable<any> {
+  getAppointments(page: number, sortField?:string, sortDirection?: string): Observable<any> {
     let url = `${this.apiUrl}?page=${page}`
     if (sortField != '') {
       url += `&sort=${sortField}`;
@@ -27,11 +27,14 @@ export class AppointmentService {
     );
   }
 
-  getFilteredAppointments(filter: string, page: number, sortField?: string, sortDirection?: 'asc' | 'desc'): Observable<any> {
+  getFilteredAppointments(filters:  { column: string, value: string }[], page: number, sortField?: string, sortDirection?: string): Observable<any> {
 
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('filter', filter);
+    let params = new HttpParams().set('page', page.toString());
+
+    // Add filters to the params
+    filters.forEach(filter => {
+      params = params.set(filter.column, filter.value);
+    });
 
     if (sortField) {
       params = params.set('sort', `${sortField},${sortDirection}`);
@@ -39,6 +42,7 @@ export class AppointmentService {
 
     return this.http.get<any>(`${this.apiUrl}/filter`, { params });
   }
+
 
 
   addAppointment(appointment: Appointment): Observable<Appointment> {

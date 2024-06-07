@@ -12,11 +12,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import {MatCellDef, MatHeaderCellDef, MatHeaderRowDef, MatRowDef, MatTableModule} from '@angular/material/table';
-
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app.routes';
 import {CommonModule, DatePipe} from "@angular/common";
 import {AppointmentService} from "./_service/appointmentService";
+import {MatSortModule} from "@angular/material/sort";
 
 @NgModule({
   declarations: [
@@ -24,6 +24,8 @@ import {AppointmentService} from "./_service/appointmentService";
   ],
   imports: [
     BrowserModule,
+    MatSortModule,
+    MatTableModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     FormsModule,

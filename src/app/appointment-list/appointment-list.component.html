@@ -1,4 +1,67 @@
-<div *ngIf="appointments.length > 0; else noAppointments">
+
+<div class="mb-3">
+  <label for="filter" class="form-label">Filter:</label>
+  <input id="filter" type="text" [(ngModel)]="filterValue" class="form-control" placeholder="Filter appointments">
+  <button type="button" class="btn btn-primary" (click)="applyFilter()">Apply Filter</button>
+</div>
+
+<div>
+  <h3>Applied Filters:</h3>
+  <ul>
+    <li *ngFor="let filter of appliedFilters">
+    {{ filter }} <button mat-mini-fab (click)="removeFilter(filter)"><mat-icon>close</mat-icon></button>
+    </li>
+  </ul>
+</div>
+
+<div>
+  <mat-checkbox *ngFor="let column of columns" [(ngModel)]="column.checked" (change)="toggleColumn(column)">
+    {{ column.name }}
+  </mat-checkbox>
+</div>
+
+
+
+<table mat-table [dataSource]="appointments" matSort (matSortChange)="onSortChange($event.active, $event.direction)">
+
+  <ng-container *ngFor="let column of displayedColumns; let i = index" [matColumnDef]="column">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+      {{ column | titlecase }}
+    </th>
+    <td mat-cell *matCellDef="let appointment" class="align-center">
+      <ng-container *ngIf="column === 'appointmentDateTime'; else otherColumn">
+        {{ appointment[column] | date: 'dd MMM yyyy, HH:mm' }}
+      </ng-container>
+      <ng-template #otherColumn>
+        {{ appointment[column] }}
+      </ng-template>
+    </td>
+  </ng-container>
+
+  <!-- Include the edit button column -->
+  <ng-container matColumnDef="edit">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let appointment">
+      <button mat-icon-button (click)="openEditDialog(appointment)">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+
+  <!-- Header row -->
+  <tr mat-header-row *matHeaderRowDef="displayedColumns.concat('edit')"></tr>
+  <!-- Data rows -->
+  <tr mat-row *matRowDef="let row; columns: displayedColumns.concat('edit');"></tr>
+</table>
+
+<mat-paginator [length]="totalAppointments" [pageSize]="5" (page)="onPageChange($event.pageIndex + 1)"></mat-paginator>
+
+
+
+
+
+
+<!--<div *ngIf="appointments.length > 0; else noAppointments">
   <div class="sort-controls">
     <mat-form-field appearance="fill">
       <mat-label>Sort By</mat-label>
@@ -15,6 +78,7 @@
       </mat-select>
     </mat-form-field>
   </div>
+
 
   <h2>Appointment List</h2>
   <div class="mb-3">
@@ -39,7 +103,7 @@
 
       </td>
     </ng-container>
-    <!-- Add a column for the edit button -->
+
     <ng-container matColumnDef="edit">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let appointment">
@@ -50,7 +114,7 @@
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns.concat('edit')"></tr>
-    <!-- Include the new column in the data rows -->
+
     <tr mat-row *matRowDef="let row; columns: displayedColumns.concat('edit');"></tr>
 
 
@@ -58,14 +122,12 @@
   <mat-paginator [length]="10" [pageSize]="5" (page)="onPageChange($event.pageIndex + 1)">
   </mat-paginator>
 
-
-
 </div>
 
 <ng-template #noAppointments>
   <p>No appointments available.</p>
 </ng-template>
-
+-->
 <!-- Add a new appointment form -->
 <div>
   <h2>Add a New Appointment</h2>
