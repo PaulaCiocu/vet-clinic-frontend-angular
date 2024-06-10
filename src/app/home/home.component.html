@@ -1,5 +1,16 @@
-<h1> Welcome to Vet Clinic Page</h1>
+<!-- welcome.component.html -->
+<div class="container mt-5">
+  <div class="card text-info-emphasis">
+    <img class="img-fluid" src="assets/images/img.png" style="max-width: 200px; max-height: 200px;">
+    <label class="card-title">Welcome to Our Vet Clinic</label>
+    <label class="card-subtitle">We are dedicated to providing exceptional care for your beloved pets.</label>
+    <label class="card-subtitle">Our team of experienced veterinarians and staff are here to ensure the health and well-being of your furry friends.</label>
 
-<button mat-button (click)="goToAppointmentList()">Go to Appointment List</button>
-<button mat-button (click)="viewDoctorService()">See services</button>
-
+    <div class="text-info-emphasis">
+      <button type="button" class="btn ui-button " (click)="goToAppointmentList()">Go to Appointments</button>
+      <button type="button" class="btn ui-button " (click)="addAppointment()">Add Appointment</button>
+      <button type="button" class="btn ui-button" (click)="viewDoctorService()">See Services</button>
+      <button type="button" class="btn ui-button" (click)="savedSearchesList()">Saved Searches</button>
+    </div>
+  </div>
+</div>

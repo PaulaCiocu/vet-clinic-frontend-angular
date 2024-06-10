@@ -26,6 +26,10 @@ import {TableColumn} from "../model/TableColumn";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {filter} from "rxjs";
 import {MatMiniFabButton} from "@angular/material/button";
+import {SavedSearchedComponent} from "../saved-searched/saved-searched.component";
+import {SavedSearchesService} from "../_service/saved-searchesService";
+import {SortCriteria} from "../model/sortCriteria";
+import {ActivatedRoute} from "@angular/router";
 
 
 @Component({
@@ -68,26 +72,18 @@ export class AppointmentListComponent implements OnInit {
   doctorServices: DoctorService[] = []; // Assuming you have a DoctorService model
   selectedServices: DoctorService[] = [];
   filterValue: string = '';
-
+  sortingHistory: SortCriteria[] = [];
   totalAppointments: number = 0;
 
-  newAppointmentData: Appointment = {
-    animalName: '',
-    doctorName: '',
-    appointmentDateTime: new Date(),
-    status: Status.CREATED,
-    totalCost: 0
-  }
   columns: TableColumn[] = [
-    {id: 'id', name: 'ID', checked: true},
-    {id: 'status', name: 'Status', checked: true},
-    {id: 'doctorName', name: 'Doctor Name', checked: true},
-    {id: 'diagnosis', name: 'Diagnosis', checked: true},
-    {id: 'animalName', name: 'Animal Name', checked: true},
-    {id: 'totalCost', name: 'Total Cost', checked: true},
-    {id: 'appointmentDateTime', name: 'Appointment Date Time', checked: true}
+    //{id: 'id', name: 'ID', checked: true},
+    {id: 'animalName', name: 'Animal Name', checked: true, sorted: false, direction: ''},
+    {id: 'doctorName', name: 'Doctor Name', checked: true, sorted:false, direction:''},
+    {id: 'appointmentDateTime', name: 'Appointment Date Time', checked: true, sorted:false, direction:''},
+    {id: 'diagnosis', name: 'Diagnosis', checked: true, sorted:false, direction:'' },
+    {id: 'totalCost', name: 'Total Cost', checked: true, sorted:false, direction:''},
+    {id: 'status', name: 'Status', checked: true, sorted:false, direction:''},
   ];
-
 
   filterKeys: { column: string, value: string }[] = [];
   displayedColumns: string[] = this.columns.filter(column => column.checked).map(column => column.id);
@@ -97,16 +93,22 @@ export class AppointmentListComponent implements OnInit {
   appliedFilters: string[] = [];
 
   appointmentsDataSource: MatTableDataSource<Appointment>;
+  private userId: number | undefined;
 
 
-  constructor(private appointmentService: AppointmentService, private doctorServiceService: DoctorServiceService, public dialog: MatDialog) {
+  constructor(private appointmentService: AppointmentService,private savedSearchService:SavedSearchesService, private doctorServiceService: DoctorServiceService,
+              private route: ActivatedRoute, public dialog: MatDialog) {
     this.appointmentsDataSource = new MatTableDataSource(this.appointments);
   }
 
 
   ngOnInit(): void {
-    // @ts-ignore
-    //this.dataSource.sort = this.sort
+    this.route.paramMap.subscribe(params => {
+        this.userId = Number(params.get('id'));
+        // Use this.userId to fetch user-specific data or perform other operations
+        console.log(this.userId);
+      });
+
     this.fetchAppointments();
     this.fetchDoctorServices();
 
@@ -123,6 +125,7 @@ export class AppointmentListComponent implements OnInit {
       next: (data) => {
         this.appointments = data.content;
         this.totalAppointments = data.totalElements;
+        console.log(this.appointments)
         // Update appointmentsTable data
 
 
@@ -138,58 +141,32 @@ export class AppointmentListComponent implements OnInit {
     this.currentPage = page - 1;
     this.fetchAppointments()
   }
+  updateColumnSorting(columnId: string, direction: string): void {
+    const column = this.columns.find(col => col.id === columnId);
+    if (column) {
+      column.sorted = true;
+      column.direction = direction; // Reset direction if needed
+    }
+
+    const index = this.sortingHistory.findIndex(criteria => criteria.column === columnId);
+
+    if (index !== -1) {
+      // Column exists, update direction
+      this.sortingHistory[index].direction = direction;
+    } else {
+      // Column does not exist, add it to sorting history
+      this.sortingHistory.push({ column: columnId, direction: direction });
+    }
+
+  }
 
   onSortChange(sortField: string, sortDirection: string): void {
     console.log(this.sortField)
     this.sortField = sortField;
-    this.sortDirection = sortDirection
+    this.sortDirection = sortDirection;
+    this.updateColumnSorting(sortField, sortDirection);
+    console.log(this.sortingHistory)
     this.fetchAppointments();
-  }
-
-  addAppointment(): void {
-
-    if (!this.newAppointmentData.doctorName || !this.newAppointmentData.animalName || this.selectedServices.length == 0) {
-      return;
-    }
-    const appointmentData: Appointment = {
-      animalName: this.newAppointmentData.animalName,
-      doctorName: this.newAppointmentData.doctorName,
-      appointmentDateTime: this.newAppointmentData.appointmentDateTime,
-      status: Status.CREATED,
-      diagnosis: '',
-      totalCost: 0,
-      serviceIds: []
-    };
-
-    if (this.selectedServices.length > 0) {
-      appointmentData.serviceIds = this.selectedServices
-        .map(service => service.id)
-        .filter((id): id is number => id !== undefined);
-    }
-
-
-    console.log(appointmentData)
-
-    this.appointmentService.addAppointment(appointmentData).subscribe({
-      next: (response) => {
-        console.log('Appointment added successfully:', response);
-        // Refresh the list of appointments
-        this.fetchAppointments();
-
-        this.newAppointmentData = {
-          animalName: '',
-          doctorName: '',
-          appointmentDateTime: new Date(),
-          status: Status.CREATED,
-          diagnosis: '',
-          totalCost: 0
-        }
-      },
-      error: (err) => {
-        console.error('Error adding appointment:', err);
-        // Handle error messages or display them to the user
-      }
-    });
   }
 
   fetchDoctorServices(): void {
@@ -231,7 +208,6 @@ export class AppointmentListComponent implements OnInit {
     }
   }
 
-
   openEditDialog(appointment: Appointment): void {
     const dialogRef = this.dialog.open(AppointmentDialogUpdateComponent, {
       data: {
@@ -245,18 +221,8 @@ export class AppointmentListComponent implements OnInit {
 
   }
 
-
-  // applyFilter(event:Event) {
-  //   this.filterValue = (event.target as HTMLInputElement).value;
-  //   this.currentPage = 0; // Reset current page to 0 when applying filter
-  //   this.fetchAppointments();
-  // }
-
-// Function to apply filter
   applyFilter() {
-
     if (this.filterValue) {
-
       console.log(this.checkIfFilterMatchesColumn(this.filterValue))
       const matchedColumn =this.checkIfFilterMatchesColumn(this.filterValue);
 
@@ -275,19 +241,11 @@ export class AppointmentListComponent implements OnInit {
           this.filterKeys.push(filterPair);
         }
 
-
-
       }
-
       console.log(this.filterKeys)
-
     }
+    this.filterValue ='';
     // Call your filter function passing the filters
-    this.fetchAppointments();
-  }
-
-  cancelFilter() {
-    this.filterValue = '';
     this.fetchAppointments();
   }
 
@@ -303,19 +261,6 @@ export class AppointmentListComponent implements OnInit {
     this.displayedColumns = this.columns.filter(col => col.checked).map(col => col.id);
   }
 
-  checkIfFilterMatches(filter: string): boolean {
-    const filterLowerCase = filter.toLowerCase();
-    return this.appointments.some(appointment => {
-      return (
-        (appointment.animalName && appointment.animalName.toLowerCase().includes(filterLowerCase)) ||
-        (appointment.doctorName && appointment.doctorName.toLowerCase().includes(filterLowerCase)) ||
-        (appointment.appointmentDateTime && appointment.appointmentDateTime.toString().toLowerCase().includes(filterLowerCase)) ||
-        (appointment.status && appointment.status.toLowerCase().includes(filterLowerCase)) ||
-        (appointment.diagnosis && appointment.diagnosis.toLowerCase().includes(filterLowerCase)) ||
-        (appointment.totalCost && appointment.totalCost.toString().toLowerCase().includes(filterLowerCase))
-      );
-    });
-  }
   checkIfFilterMatchesColumn(filter: string): string | null {
     const filterLowerCase = filter.toLowerCase();
 
@@ -343,6 +288,22 @@ export class AppointmentListComponent implements OnInit {
     return null; // Return null if no match is found
   }
 
+
+  saveFilter() {
+    console.log(this.filterKeys);
+    const dialogRef = this.dialog.open(SavedSearchedComponent,{
+        data:{
+          filterKeys: this.filterKeys,
+          appointment: this.appointments,
+          displayedColumns: this.displayedColumns,
+          savedSearchService: this.savedSearchService,
+          sortingHistory: this.sortingHistory,
+          userId:this.userId
+        }
+
+    }
+    );
+  }
 
 
 }

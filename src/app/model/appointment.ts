@@ -8,7 +8,7 @@ export interface Appointment {
   status: string;
   diagnosis?: string;
   totalCost: number;
-  serviceIds?: number[] | undefined
+  serviceIds: number[]
 }
 
 export enum Status {

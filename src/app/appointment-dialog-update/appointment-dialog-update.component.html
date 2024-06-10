@@ -1,0 +1,47 @@
+<!-- Add a new appointment form -->
+
+<div class="mb-3">
+  <label class="form-label">Animal Name:</label>
+  <input type="text" [(ngModel)]="appointmentData.animalName" name="animalName" class="form-control" required>
+</div>
+<!-- Doctor Name -->
+<div class="mb-3">
+  <label class="form-label">Doctor Name:</label>
+  <input type="text" [(ngModel)]="appointmentData.doctorName" name="doctorName" class="form-control" required>
+</div>
+<!-- Appointment Date and Time -->
+<div class="mb-3">
+  <label for="appointmentDateTime" class="form-label">Appointment Date and Time:</label>
+  <input type="datetime-local" id="appointmentDateTime" [ngModel]="formatDateTime(appointmentData.appointmentDateTime)" (ngModelChange)="appointmentData.appointmentDateTime = parseDateTime($event)" name="appointmentDateTime" class="form-control" required>
+</div>
+
+<div class="mb-3">
+  <label class="form-label">Diagnosis:</label>
+  <input type="text" [(ngModel)]="appointmentData.diagnosis" name="diagnosis" class="form-control">
+</div>
+
+<!-- Status -->
+<div class="mb-3">
+  <label for="status" class="form-label">Status:</label>
+  <select id="status" [(ngModel)]="appointmentData.status" name="status" class="form-control" required>
+    <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+  </select>
+  <div class="text-danger">
+    *For status COMPLETED, diagnosis is required.
+  </div>
+</div>
+
+<div class="mb-3">
+  <label class="form-label">Doctor Services:</label>
+  <div class="form-check" *ngFor="let service of doctorServices">
+    <input class="form-check-input" type="checkbox" id="service{{ service.id }}" [value]="service" [checked]="isSelected(service)" (change)="toggleSelection(service)">
+    <label class="form-check-label" for="service{{ service.id }}">
+      {{ service.name }} ({{ service.price | currency }})
+    </label>
+  </div>
+</div>
+
+
+<!--<button type="submit" class="btn btn-primary" (click)="displaySelectedServices()">Display Services</button>-->
+<button type="submit" class="btn btn-primary" (click)="updateAppointment()">Update Appointment</button>
+<button type="submit" class="btn btn-danger" (click)="closeDialog()">Cancel Appointment</button>

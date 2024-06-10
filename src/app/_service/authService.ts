@@ -33,10 +33,11 @@ export class AuthService {
       console.log(loggedInUser);
       if (loggedInUser) {
         // User found, navigate to home page or dashboard
-        this.router.navigate(['/home']); // Replace '/home' with your home page route
+        this.router.navigate([`/home/${loggedInUser.id}`]); // Replace '/home' with your home page route
       } else {
         // User not found, handle login failure
         console.error('Invalid username or password');
+        alert('Invalid username or password')
         // Optionally, you can show a login error message to the user
       }
     });

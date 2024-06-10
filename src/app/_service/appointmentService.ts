@@ -3,6 +3,7 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {map, Observable} from 'rxjs';
 import {Appointment} from "../model/appointment";
 import {DoctorService} from "../model/doctorService";
+import {SortCriteria} from "../model/sortCriteria";
 
 
 @Injectable({
@@ -13,7 +14,7 @@ export class AppointmentService {
 
   constructor(private http: HttpClient) { }
 
-  getAppointments(page: number, sortField?:string, sortDirection?: string): Observable<any> {
+  getAppointments(page?: number, sortField?:string, sortDirection?: string): Observable<any> {
     let url = `${this.apiUrl}?page=${page}`
     if (sortField != '') {
       url += `&sort=${sortField}`;
@@ -39,6 +40,23 @@ export class AppointmentService {
     if (sortField) {
       params = params.set('sort', `${sortField},${sortDirection}`);
     }
+
+    return this.http.get<any>(`${this.apiUrl}/filter`, { params });
+  }
+
+  getFilteredAppointmentsMultipleCriteria(filters: { column: string, value: string }[], page: number, sort: SortCriteria[]): Observable<any> {
+
+    let params = new HttpParams().set('page', page.toString());
+
+    // Add filters to the params
+    filters.forEach(filter => {
+      params = params.set(filter.column, filter.value);
+    });
+
+    // Add sort criteria to the params
+    sort.forEach(sortCriteria => {
+      params = params.append('sort', `${sortCriteria.column},${sortCriteria.direction}`);
+    });
 
     return this.http.get<any>(`${this.apiUrl}/filter`, { params });
   }

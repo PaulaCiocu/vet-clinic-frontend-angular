@@ -1,0 +1,50 @@
+<div class="container-fluid mt-5">
+  <div class="row justify-content-center">
+
+    <!-- Add a new appointment form -->
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title">Add a New Appointment</h2>
+          <form #appointmentForm="ngForm" (ngSubmit)="addAppointment()" novalidate>
+            <!-- Animal Name -->
+            <div class="mb-3">
+              <label for="animalName" class="card-subtitle">Animal Name:</label>
+              <input type="text" id="animalName" [(ngModel)]="newAppointmentData.animalName" name="animalName" class="form-control" required>
+              <div class="text-danger">*Animal Name is required.</div>
+            </div>
+
+            <!-- Doctor Name -->
+            <div class="mb-3">
+              <label for="doctorName" class="card-subtitle">Doctor Name:</label>
+              <input type="text" id="doctorName" [(ngModel)]="newAppointmentData.doctorName" name="doctorName" class="form-control" required>
+              <div class="text-danger">*Doctor Name is required.</div>
+            </div>
+
+            <!-- Appointment Date and Time -->
+            <div class="mb-3">
+              <label for="appointmentDateTime" class="card-subtitle">Appointment Date and Time:</label>
+              <input type="datetime-local" id="appointmentDateTime" [ngModel]="formatDateTime(newAppointmentData.appointmentDateTime)" (ngModelChange)="newAppointmentData.appointmentDateTime = parseDateTime($event)" name="appointmentDateTime" class="form-control" required>
+              <div class="text-danger">Appointment Date and Time are required.</div>
+            </div>
+
+            <!-- Doctor Services -->
+            <div class="mb-3">
+              <label class="card-subtitle">Doctor Services:</label>
+              <div class="form-check" *ngFor="let service of doctorServices">
+                <input class="form-check-input" type="checkbox" id="service{{ service.id }}" [value]="service" [checked]="isSelected(service)" (change)="toggleSelection(service)">
+                <label class="form-check-label" for="service{{ service.id }}">
+                  {{ service.name }} ({{ service.price | currency }})
+                </label>
+              </div>
+              <div class="text-danger">
+                *At least one service must be selected.
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Add Appointment</button>
+          </form>
+        </div>
+      </div>
+  </div>
+</div>

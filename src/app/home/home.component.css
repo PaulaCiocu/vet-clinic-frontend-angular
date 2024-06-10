@@ -1,0 +1,41 @@
+
+/* Adjust text size and spacing */
+.card {
+  margin-bottom: 20px;
+  background: #c1edee;
+  width: 1300px;
+  height: 700px;
+  padding: 20px;
+  align-self: center;
+}
+
+.card-title {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.card-subtitle{
+  font-size: 1.25rem;
+  text-align: center;
+  padding-top: 40px;
+
+}
+
+.card-text {
+  font-size: 0.8rem;
+}
+.ui-button{
+  margin-top: 140px;
+  align-self: center;
+  margin-left: 100px;
+  font-size: 1.5rem;
+  background: #ffffff;
+
+}
+
+.img-fluid{
+  margin-left: 20px;
+  border-radius: 6rem ;
+  margin-top: 20px;
+}

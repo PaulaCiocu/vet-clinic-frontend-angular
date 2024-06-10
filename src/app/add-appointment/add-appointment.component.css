@@ -1,0 +1,28 @@
+
+
+
+.card {
+  margin-bottom: 20px;
+  background: #c1edee;
+  width: 1300px;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.card-subtitle{
+  font-size: 1rem;
+  margin-bottom: 10px;
+
+}
+
+.card-text {
+  font-size: 0.8rem;
+}
+
+.list-group-item {
+  font-size: 0.85rem;
+}
