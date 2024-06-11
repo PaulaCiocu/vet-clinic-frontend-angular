@@ -14,28 +14,23 @@ export class AppointmentService {
 
   constructor(private http: HttpClient) { }
 
-  getAppointments(page?: number, sortField?:string, sortDirection?: string): Observable<any> {
-    let url = `${this.apiUrl}?page=${page}`
-    if (sortField != '') {
-      url += `&sort=${sortField}`;
-    }
-    if(sortDirection){
-      url += `,${sortDirection}`
-    }
+  getAllAppointments(): Observable<any> {
 
-    return this.http.get<any>(`${url}`).pipe(
-      map(response => response.content)
-    );
+    return this.http.get<any>(`${this.apiUrl}/all`);
   }
 
-  getFilteredAppointments(filters:  { column: string, value: string }[], page: number, sortField?: string, sortDirection?: string): Observable<any> {
 
-    let params = new HttpParams().set('page', page.toString());
+  getFilteredAppointments(filters: { column: string, value: string }[], sortField?: string, sortDirection?: string,  page?: number): Observable<any> {
+    let params = new HttpParams();
 
     // Add filters to the params
     filters.forEach(filter => {
       params = params.set(filter.column, filter.value);
     });
+
+    if (page !== undefined) {
+      params = params.set('page', page.toString());
+    }
 
     if (sortField) {
       params = params.set('sort', `${sortField},${sortDirection}`);

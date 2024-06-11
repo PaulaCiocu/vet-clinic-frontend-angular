@@ -55,13 +55,13 @@ export class AppointmentDialogUpdateComponent {
       return;
     }
     const appointmentData: Appointment = {
-      id: this.appointmentData.id, // Assuming you have an 'id' field for identifying the appointment to update
+      id: this.appointmentData.id,
       animalName: this.appointmentData.animalName,
       doctorName: this.appointmentData.doctorName,
       appointmentDateTime: this.appointmentData.appointmentDateTime,
-      status: this.appointmentData.status, // Assuming you have a 'status' field
-      diagnosis: this.appointmentData.diagnosis, // Assuming you have a 'diagnosis' field
-      totalCost: 0, // Assuming you have a 'totalCost' field
+      status: this.appointmentData.status,
+      diagnosis: this.appointmentData.diagnosis,
+      totalCost: 0,
       serviceIds: []
     };
 
@@ -71,7 +71,7 @@ export class AppointmentDialogUpdateComponent {
         .filter((id): id is number => id !== undefined);
 
       this.selectedServices.map(service => {
-        appointmentData.totalCost += service.price; // Sum up the price of each selected service
+        appointmentData.totalCost += service.price;
         return service.id;
       })
     }
@@ -85,7 +85,6 @@ export class AppointmentDialogUpdateComponent {
       },
       error: (err) => {
         console.error('Error adding appointment:', err);
-        // Handle error messages or display them to the user
       }
     });
 
@@ -125,12 +124,10 @@ export class AppointmentDialogUpdateComponent {
   toggleSelection(service: DoctorService): void {
     const index = this.selectedServices.findIndex(selectedService => selectedService.id === service.id);
     if (index !== -1) {
-      // Service is already selected, remove it
       this.selectedServices.splice(index, 1);
     } else {
-      // Service is not selected, add it
       this.selectedServices.push(service);
-      // Add the service ID to the appointmentData.serviceIds if it's not already there
+
 
     }
   }

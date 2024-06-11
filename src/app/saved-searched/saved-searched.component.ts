@@ -61,15 +61,17 @@ export class SavedSearchedComponent{
   }
   sortingHistory:SortCriteria[];
   userId: number;
+  currentPage:number;
 
   constructor(private dialogRef: MatDialogRef<SavedSearchedComponent>,
     @Inject(MAT_DIALOG_DATA) public data:{filterKeys:{ column: string, value: string }[], appointment: Appointment[], displayedColumns:string[],
-      savedSearchService:SavedSearchesService, sortingHistory: SortCriteria[], userId:number}) {
+      savedSearchService:SavedSearchesService, sortingHistory: SortCriteria[], userId:number, pageNumber: number}) {
     this.filterKeys = data.filterKeys;
     this.appointments = data.appointment
     this.displayedColumns =data.displayedColumns
     this.sortingHistory = data.sortingHistory;
     this.userId =data.userId
+    this.currentPage =data.pageNumber
     console.log(this.appointments)
     console.log(this.displayedColumns)
     console.log(this.sortingHistory)
@@ -94,6 +96,7 @@ export class SavedSearchedComponent{
     this.savedSearch.sortCriteria = this.sortingHistory
     this.savedSearch.columnVisibility=this.columnVisibility[this.searchName]
     this.savedSearch.userID = this.userId;
+    this.savedSearch.pageNumber = this.currentPage
     console.log(this.savedSearch)
 
 

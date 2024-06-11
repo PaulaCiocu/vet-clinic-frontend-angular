@@ -10,14 +10,16 @@ export class SavedSearch {
   sortCriteria?: SortCriteria[];
   columnVisibility?: ColumnVisibility[];
   userID?: number;
+  pageNumber?:number
 
-  constructor(id: number, name: string, filterKeys: {column: string, filterValue: string}[], sortCriteria: SortCriteria[], columnVisibility: ColumnVisibility[], userID: number) {
+  constructor(id: number, name: string, filterKeys: {column: string, filterValue: string}[], sortCriteria: SortCriteria[], columnVisibility: ColumnVisibility[], userID: number, pageNumber:number) {
     this.id = id;
     this.name = name;
     this.filterKeys = filterKeys;
     this.sortCriteria = sortCriteria;
     this.columnVisibility = columnVisibility;
     this.userID = userID;
+    this.pageNumber = pageNumber;
   }
 
 

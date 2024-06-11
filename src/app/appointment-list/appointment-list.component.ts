@@ -66,17 +66,16 @@ import {ActivatedRoute} from "@angular/router";
 })
 export class AppointmentListComponent implements OnInit {
   appointments: Appointment[] = [];
+  allAppointments:Appointment[]=[]
   sortField: string = '';
   currentPage: number = 0;
   sortDirection: string = '';
-  doctorServices: DoctorService[] = []; // Assuming you have a DoctorService model
-  selectedServices: DoctorService[] = [];
+  doctorServices: DoctorService[] = [];
   filterValue: string = '';
   sortingHistory: SortCriteria[] = [];
   totalAppointments: number = 0;
 
   columns: TableColumn[] = [
-    //{id: 'id', name: 'ID', checked: true},
     {id: 'animalName', name: 'Animal Name', checked: true, sorted: false, direction: ''},
     {id: 'doctorName', name: 'Doctor Name', checked: true, sorted:false, direction:''},
     {id: 'appointmentDateTime', name: 'Appointment Date Time', checked: true, sorted:false, direction:''},
@@ -87,7 +86,6 @@ export class AppointmentListComponent implements OnInit {
 
   filterKeys: { column: string, value: string }[] = [];
   displayedColumns: string[] = this.columns.filter(column => column.checked).map(column => column.id);
-  dataSource = new MatTableDataSource(this.appointments);
   @ViewChild(MatSort) sort: MatSort | undefined;
 
   appliedFilters: string[] = [];
@@ -105,30 +103,41 @@ export class AppointmentListComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
         this.userId = Number(params.get('id'));
-        // Use this.userId to fetch user-specific data or perform other operations
         console.log(this.userId);
       });
 
     this.fetchAppointments();
     this.fetchDoctorServices();
+    this.fetchAllAppointment();
+
 
   }
 
+  fetchAllAppointment(){
+    this.appointmentService.getAllAppointments().subscribe({
+      next: (data) => {
+        this.allAppointments = data
+        console.log(this.allAppointments)
+        // Update appointmentsTable data
+      },
+      error: (err) => {
+        console.error('Error fetching all appointments', err);
+      }
+    });
+  }
   fetchAppointments(): void {
     console.log(this.filterValue)
     this.appointmentService.getFilteredAppointments(
       this.filterKeys,
-      this.currentPage,
       this.sortField,
-      this.sortDirection
+      this.sortDirection,
+      this.currentPage
     ).subscribe({
       next: (data) => {
         this.appointments = data.content;
         this.totalAppointments = data.totalElements;
         console.log(this.appointments)
         // Update appointmentsTable data
-
-
       },
       error: (err) => {
         console.error('Error fetching appointments', err);
@@ -145,16 +154,14 @@ export class AppointmentListComponent implements OnInit {
     const column = this.columns.find(col => col.id === columnId);
     if (column) {
       column.sorted = true;
-      column.direction = direction; // Reset direction if needed
+      column.direction = direction;
     }
 
     const index = this.sortingHistory.findIndex(criteria => criteria.column === columnId);
 
     if (index !== -1) {
-      // Column exists, update direction
       this.sortingHistory[index].direction = direction;
     } else {
-      // Column does not exist, add it to sorting history
       this.sortingHistory.push({ column: columnId, direction: direction });
     }
 
@@ -170,7 +177,6 @@ export class AppointmentListComponent implements OnInit {
   }
 
   fetchDoctorServices(): void {
-    // Call the service to fetch doctor services
     this.doctorServiceService.getServices().subscribe({
       next: (data) => {
         this.doctorServices = data;
@@ -180,32 +186,6 @@ export class AppointmentListComponent implements OnInit {
         console.error('Error fetching doctor services', err);
       }
     });
-  }
-
-  formatDateTime(date: Date): string {
-    // Format the date as "yyyy-MM-ddTHH:mm" for input[type=datetime-local]
-    const isoString = date.toISOString();
-    return isoString.substring(0, 16);
-  }
-
-  parseDateTime(dateTimeString: string): Date {
-    // Parse the input string to Date object
-    return new Date(dateTimeString);
-  }
-
-  isSelected(service: DoctorService): boolean {
-    return this.selectedServices.some(selectedService => selectedService.id === service.id);
-  }
-
-  toggleSelection(service: DoctorService): void {
-    const index = this.selectedServices.findIndex(selectedService => selectedService.id === service.id);
-    if (index !== -1) {
-      // Service is already selected, remove it
-      this.selectedServices.splice(index, 1);
-    } else {
-      // Service is not selected, add it
-      this.selectedServices.push(service);
-    }
   }
 
   openEditDialog(appointment: Appointment): void {
@@ -225,19 +205,14 @@ export class AppointmentListComponent implements OnInit {
     if (this.filterValue) {
       console.log(this.checkIfFilterMatchesColumn(this.filterValue))
       const matchedColumn =this.checkIfFilterMatchesColumn(this.filterValue);
-
       if (matchedColumn) {
         this.appliedFilters = [...new Set([...this.appliedFilters, this.filterValue])];
         const filterPair = { column: matchedColumn, value: this.filterValue };
-
-        // Check if the column already exists in filterKeys
         const existingPairIndex = this.filterKeys.findIndex(pair => pair.column === filterPair.column);
 
         if (existingPairIndex !== -1) {
-          // Update the value if the column already exists
           this.filterKeys[existingPairIndex].value = filterPair.value;
         } else {
-          // Add the filter pair if the column does not exist
           this.filterKeys.push(filterPair);
         }
 
@@ -245,15 +220,12 @@ export class AppointmentListComponent implements OnInit {
       console.log(this.filterKeys)
     }
     this.filterValue ='';
-    // Call your filter function passing the filters
     this.fetchAppointments();
   }
 
   removeFilter(filter: string) {
     this.appliedFilters = this.appliedFilters.filter(f => f !== filter);
-    // Remove the corresponding filter pair from filterKeys
     this.filterKeys = this.filterKeys.filter(pair => pair.value !== filter);
-    // Call your filter function passing the updated filters
     this.fetchAppointments();
   }
 
@@ -263,8 +235,8 @@ export class AppointmentListComponent implements OnInit {
 
   checkIfFilterMatchesColumn(filter: string): string | null {
     const filterLowerCase = filter.toLowerCase();
-
-    for (const appointment of this.appointments) {
+    this.fetchAllAppointment()
+    for (const appointment of this.allAppointments) {
       if (appointment.animalName && appointment.animalName.toLowerCase().includes(filterLowerCase)) {
         return 'animalName';
       }
@@ -284,8 +256,7 @@ export class AppointmentListComponent implements OnInit {
         return 'totalCost';
       }
     }
-
-    return null; // Return null if no match is found
+    return null;
   }
 
 
@@ -298,12 +269,12 @@ export class AppointmentListComponent implements OnInit {
           displayedColumns: this.displayedColumns,
           savedSearchService: this.savedSearchService,
           sortingHistory: this.sortingHistory,
-          userId:this.userId
+          userId:this.userId,
+          pageNumber: this.currentPage
         }
 
     }
     );
   }
-
 
 }

@@ -52,6 +52,7 @@ export class SavedSearchesListComponent implements OnInit{
   sortingHistorySearches :{ [name: string]: SortCriteria[] } = {}
   columnVisibility: { [name: string]: string[] } = {};
   userID:number | undefined;
+  pageNumber: number =0;
 
   constructor(private savedSearchesService:SavedSearchesService, private appointmentService: AppointmentService, private route:ActivatedRoute) {
 
@@ -80,18 +81,19 @@ export class SavedSearchesListComponent implements OnInit{
             }) || [];
             this.columnVisibility[search.name] = search.columnVisibility?.map(visible => visible.column) || [];
 
-
-            // Populate sortingHistorySearches
             this.sortingHistorySearches[search.name] = search.sortCriteria || [];
 
             this.filterKeys = search.filterKeys?.map(filterKey => {
               return { column: filterKey.column, value: filterKey.filterValue };
             }) || [];
 
-            const firstSortCriteria = this.sortingHistorySearches[search.name][0] || null;
+            if(search.pageNumber !=null){
+              this.pageNumber = search.pageNumber;
+            }
+
             this.appointmentService.getFilteredAppointmentsMultipleCriteria(
               this.filterKeys,
-              0,
+              this.pageNumber,
               this.sortingHistorySearches[search.name]
             ).subscribe({
               next: (data) => {
@@ -110,10 +112,6 @@ export class SavedSearchesListComponent implements OnInit{
           }
 
         });
-        //console.log(this.appointments)
-        //console.log(this.savedSearches);
-        //console.log(this.filteredSearches);
-        //console.log(this.sortingHistorySearches)
       },
       error: (err) => {
         console.error('Error fetching searches', err);

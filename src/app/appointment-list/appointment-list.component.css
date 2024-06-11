@@ -45,6 +45,9 @@
   margin-left: 20px;
 }
 
+.filter-form{
+  width: 100px;
+}
 .card-text {
   font-size: 0.8rem;
 }
@@ -74,4 +77,24 @@ th {
 
   border-radius: 0.4rem;
   width: 600px;
+}
+
+.img-fluid{
+  border-radius: 2rem;
+  margin-top: 20px;
+  margin-right: 10px;
+}
+
+.small-input {
+  width: 250px;
+}
+.edit-icon {
+  color: white; /* Change it to your desired color */
+  background: rgb(243, 68, 112);
+  border: none;
+}
+.pinkButton{
+  background-color: #f34470;
+  border-color: #f34470;
+  color: white
 }
